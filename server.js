@@ -1,9 +1,17 @@
-var ottoman = require('ottoman');
-var couchbase = require('couchbase');
+require('dotenv').config()
+const { cbUser, cbPass } = process.env
 
-var cluster = new couchbase.Cluster('couchbase://localhost')
-cluster.authenticate('Administrator', 'password')
-ottoman.bucket = cluster.openBucket('task-management');
+var ottoman = require('ottoman')
+var couchbase = require('couchbase')
+
+var cluster = new couchbase.Cluster(
+  'couchbase://localhost'
+)
+
+cluster.authenticate(cbUser, cbPass)
+ottoman.bucket = cluster.openBucket(
+  'task-management'
+)
 
 // Let's create our model to store Todo, this
 var Todo = ottoman.model('todo', {
