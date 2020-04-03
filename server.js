@@ -4,14 +4,10 @@ const { cbUser, cbPass } = process.env
 var ottoman = require('ottoman')
 var couchbase = require('couchbase')
 
-var cluster = new couchbase.Cluster(
-  'couchbase://localhost'
-)
+var cluster = new couchbase.Cluster('couchbase://localhost')
 
 cluster.authenticate(cbUser, cbPass)
-ottoman.bucket = cluster.openBucket(
-  'task-management'
-)
+ottoman.bucket = cluster.openBucket('task-management')
 
 // Let's create our model to store Todo, this
 var Todo = ottoman.model('todo', {
@@ -32,49 +28,48 @@ var Todo = ottoman.model('todo', {
   }
 });
 
-var todo_01 = new Todo({ 
-  name: 'take out trash', 
-  complete: false, 
+var todo_01 = new Todo({
+  name: 'take out trash',
+  complete: false,
   priority: 1,
   created: Date.now()
 });
-var todo_02 = new Todo({ 
-  name: 'take dog on walk', 
-  complete: false, 
+var todo_02 = new Todo({
+  name: 'walk the dog',
+  complete: false,
   priority: 2,
   created: Date.now()
 });
-var todo_03 = new Todo({ 
-  name: 'take cat on walk', 
-  complete: false, 
+var todo_03 = new Todo({
+  name: 'walk the cat',
+  complete: false,
   priority: 2,
   created: Date.now()
 });
 
-todo_01.save((err) => {
-  if (err) return console.error(err);
+todo_01.save((err) => err
+  ? console.error(err)
+  : console.info("success: Todo added!")
+);
+
+todo_02.save((err) => err
+  ? console.error(err)
+  : console.info("success: Todo added!")
+);
+
+todo_03.save((err) => err
+  ? console.error(err)
+  : console.info("success: Todo added!")
+);
+
+ottoman.ensureIndices(function(err) {
+  if (err) {
+    console.log('failed to created necessary indices', err);
+    return;
+  }
+
+  Todo.findByName('take out trash', (err, todo) => {
+    if (err) return console.error(err)
+    console.log(todo)
+  })
 });
-
-todo_02.save((err) => {
-  if (err) return console.error(err);
-});
-
-todo_03.save((err) => {
-  if (err) return console.error(err);
-});
-
-ottoman.ensureIndices( (err) => {
-  if (err) return console.log('indices create failed', err);
-  console.log('indices ready to use!');
-});
-
-Todo.findByName('take out trash', (err, todo) => {
-  if (err) return console.error(err);
-  console.log(todo);
-})
-
-// let statement = "SELECT todo.* FROM `task-management` AS todo WHERE todo.priority = 2;"
-// Todo.findByPriority(statement, (err, todos) => {
-//   if (err) return console.error(err);
-//   console.log(todos);
-// })
