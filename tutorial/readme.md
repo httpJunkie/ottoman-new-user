@@ -190,11 +190,11 @@ Remove the last addition code.
 
 One way to see if your indexes were created in Couchbase is to open Couchbase server and navigate to the Indexes tab and see that they were added:
 
-![todo indexes](./doc-images/todo-indexes.jpg)
+![todo indexes](doc-images/todo-indexes.jpg)
 
 As well look at the documents tab and see the reference documents were also added:
 
-![todo reference documents](/doc-images/todo-ref-douments.jpg)
+![todo reference documents](doc-images/todo-ref-douments.jpg)
 
 But we need a way to do this in our code. This is what `ottoman.ensureIndicies()` method is for. Let's add this to our code:
 
