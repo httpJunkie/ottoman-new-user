@@ -196,16 +196,18 @@ As well look at the documents tab and see the reference documents were also adde
 
 ![todo reference documents](doc-images/todo-ref-douments.jpg)
 
-But we need a way to do this in our code. This is what `ottoman.ensureIndicies()` method is for. Let's add this to our code:
+It's great that we can log into our [Couchbase Server web console](localhost:8091) and see that the indexes and reference files were created, but we need a way to check that our indexes and reference documents exist from within our code.
+
+We can do this with the `ottoman.ensureIndicies()` method. This method returns true or false, but for now, we will use a callback that checks for an error, if there is no error, we can do work.
 
 ```js
 ottoman.ensureIndices(function(err) {
   if (err) {
-    console.log('failed to created necessary indices', err);
+    console.log('Failed to created indexes and reference docs', err);
     return;
   }
-  // do things here that require indexes
-  console.log('ottoman indices are ready for use!');
+  // do work
+  console.log('Created indexes and reference docs!');
 });
 ```
 
