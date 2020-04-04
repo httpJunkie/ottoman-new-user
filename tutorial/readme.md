@@ -1,6 +1,6 @@
 # Getting Started With Ottoman
 
-Currently there is no support for Couchbase Node JS SDK 3, For this reason, we will be installing `couchbase@^2.6`. 
+Currently there is no support for Couchbase Node JS SDK 3, For this reason, we will be installing `couchbase@^2.6`.
 
 First we will need Couchbase Server running, with a bucket named `task-management`. The best way to work with Couchbase Server or any database from a developer environment is to use Docker.
 
@@ -36,21 +36,23 @@ Run our Docker containter:
 docker run -d -p 8091-8094:8091-8094 -p 11210:11210 -e CB_ADMIN_USER=Administrator -e CB_ADMIN_PASS=password -e CB_BUCKET=task-management -e CB_BUCKET_PASS= --name cbs1 couchbase-server-lt
 ```
 
-## Create Docuemnts and Retrieve in Node with Ottoman
+## Create Documents and Retrieve in Node with Ottoman
 
 Now that we have our database up and running, we just need to create a Node application that with the assistance of Ottoman, we can setup a model for our documents of type "todo" and add them to the bucket and turn around and retrieve a single document.
 
 ### Creating the Node JS App
 
-Create the directory and initialize npm and install couchbase and ottoman and, setup config file and open `server.js` the file we will be using to create our Node application.
+Create a project directory initializing npm and installing `couchbase`, `ottoman`, `dotenv` and, setting up a config and `server.js` file.
 
 ```sh
-mkdir task-manager && cd $_ && npm init -y && npm install couchbase ottoman dotenv && touch .env && echo -e "user=Administrator \npass=123456 \n" >> .env && touch .server.js && code .
+mkdir task-manager && cd $_ && npm init -y && npm install couchbase ottoman dotenv && touch .env && echo -e "user=Administrator \npass=123456 \n" >> .env && touch .server.js
 ```
 
-That last command created a file named `.env` which we'll use to store our credentials for our database connection in a separate file. It also creates a `server.js` file that we will be adding code to. In the code samples below, we will add each new section of one after another. Let's get started building our first Ottoman app!
+Opening the project with your code editor of choice. I am using VS Code, so I can do that from the command line with: `code .`
 
-*NOTE: A .env file typically is not uploaded to your git repository, and tracked with a Git ignore `.ignore` file*
+We created a file named `.env` which we'll use to store our credentials for our database connection. We also created a `server.js` file that we will be adding our code to. In the code samples below, we will add each new section of code one after another. Let's get started building our Ottoman app.
+
+*NOTE: A .env file typically is not uploaded to your git repository. If you have cloned this repo I have kept it part of our repo for your convenience, normally we would have a line in our .`.ignore` file to keep Git from tracking this file*
 
 ### Connecting to Couchbase Bucket
 
