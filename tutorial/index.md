@@ -1,8 +1,8 @@
 # Getting Started With Ottoman
 
-Currently there is no support for Couchbase Node JS SDK 3, For this reason, we will be installing `couchbase@^2.6`.
+Currently, there is no support for Couchbase Node JS SDK 3, For this reason, we will be installing `couchbase@^2.6`.
 
-First we will need Couchbase Server running, with a bucket named `task-management`. The best way to work with Couchbase Server or any database from a developer environment is to use Docker.
+We will need Couchbase Server running, with a bucket named `task-management`. The best way to work with Couchbase Server or any database from a development environment is to use Docker.
 
 ## Build and Run Couchbase Server with Named Bucket
 
@@ -38,11 +38,11 @@ docker run -d -p 8091-8094:8091-8094 -p 11210:11210 -e CB_ADMIN_USER=Administrat
 
 ## Create Documents and Retrieve in Node with Ottoman
 
-Now that we have our database up and running, we just need to create a Node application that with the assistance of Ottoman, we can setup a model for our documents of type "todo" and add them to the bucket and turn around and retrieve a single document.
+Now that we have our database up and running, we just need to create a Node application that with the assistance of Ottoman, we can set up a model for our documents of type "todo" and add them to the bucket and turn around and retrieve a single document.
 
 ### Creating the Node JS App
 
-Create a project directory initializing npm and installing `couchbase`, `ottoman`, `dotenv` and, setting up a config and `server.js` file.
+Create a project directory initializing npm and installing `couchbase`, `ottoman`, `dotenv`, setting up our config and `server.js` file.
 
 ```sh
 mkdir task-manager && cd $_ && npm init -y && npm install couchbase ottoman dotenv && touch .env && echo -e "user=Administrator \npass=123456 \n" >> .env && touch .server.js
@@ -72,7 +72,7 @@ ottoman.bucket = cluster.openBucket('task-management')
 
 ### Creating an Ottoman Model
 
-Create a model that will be our `todo` document. It will get auto-created and stored in our designated `task-management` Couchbase bucket.
+Create a model for our `todo` document. It will get auto-created and stored in our already created `task-management` bucket in Couchbase.
 
 ```js
 var Todo = ottoman.model('todo', {
@@ -90,9 +90,9 @@ var Todo = ottoman.model('todo', {
 });
 ```
 
-We have used four different types in this model ensuring that we tell Ottoman what kind of data will be stored for each field in our model. As we continue learning we will use more data types and even learn about custom data types that Ottoman supports.
+We have used four different types in this model (`string`, `boolean`, `integer`, and `Date`) telling Ottoman what kind of data to use for each field in our model. Ottoman supports many other types and we will learn about more as we continue the tutorial.
 
-We have also created an index to ensure that we can efficiently retrieve a todo document by name using Couchbase's indexing strategy.
+Notice that we have also created an index `findByName` allowing us to efficiently retrieve a todo document by name.
 
 ### Create New Documents Using Our Todo Model
 
@@ -130,21 +130,21 @@ Call Ottoman's `save()` method on each of these objects which will add them to o
 ```js
 todo_01.save((err) => err
   ? console.error(err)
-  : console.info("success: Dragon added!")
+  : console.info("success: Todo added!")
 );
 
 todo_02.save((err) => err
   ? console.error(err)
-  : console.info("success: Dragon added!")
+  : console.info("success: Todo added!")
 );
 
 todo_03.save((err) => err
   ? console.error(err)
-  : console.info("success: Dragon added!")
+  : console.info("success: Todo added!")
 );
 ```
 
-With the `save()` methods added, let's run our app. You shold get three success messages in the console and zero errors.
+With the `save()` methods added, let's run our app. You should get three success messages in the console and zero errors.
 
 To understand what the save function is doing, let's add one more Todo and log a `console.error()` if an error occurs otherwise a `console.info` if a new Todo is added with success.
 
@@ -160,7 +160,7 @@ new Todo({
 );
 ```
 
-*I condensed the creation of the object and the save into one chunk of code so that it will be easy to delete afterwards. This is just a test document as we do not own a dragon.*
+*I condensed the creation of the object and the save into one chunk of code so that it will be easy to delete afterward. This is just a test document as we do not own a dragon.*
 
 Stop your server (Control + C), and once the above code is added run `node server` again and we will see 3 errors and one success message.
 
@@ -198,10 +198,10 @@ As well look at the documents tab and see the reference documents were also adde
 
 It's great that we can log into our [Couchbase Server web console](localhost:8091) and see that the indexes and reference files were created, but we need a way to check that our indexes and reference documents exist from within our code.
 
-We can do this with the `ottoman.ensureIndicies()` method. This method returns true or false, but for now, we will use a callback that checks for an error, if there is no error, we can do work.
+We can do this with the `ottoman.ensureIndicies()` method. This method ensures that all currently registered indices have been persisted to the data store and are useable.
 
 ```js
-ottoman.ensureIndices(function(err) {
+ottoman.ensureIndices((err) => {
   if (err) {
     console.log('Failed to created indexes and reference docs', err);
     return;
@@ -214,7 +214,7 @@ ottoman.ensureIndices(function(err) {
 Let's update that code to use our index and lookup we have defined that will allow us to retrieve a particular todo document:
 
 ```js
-ottoman.ensureIndices(function(err) {
+ottoman.ensureIndices((err) => {
   if (err) {
     console.log('failed to created necessary indices', err);
     return;
@@ -225,4 +225,58 @@ ottoman.ensureIndices(function(err) {
     console.log(todo)
   })
 });
+```
+
+## Avoiding Callback Hell with Promises
+
+The way that we just called our `findByName()` method is concerning because we can end up doing a lot of stuff inside that `ensureIndices` function, potentially calling more functions which in turn have callbacks and entering into a callback hell.
+
+Since this function does not return a promise we can simply promis-ify it on our own.
+
+If you want to learn more about promises, check out [Promises on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+
+We want to use a promise when calling `ensureIndicies()` so we can do one or multiple things in the event of the promise is fulfilled or do another thing like, (log our error) when rejected.
+
+Create two methods `onIndiciesFulfilled()` or `onIndiciesRejected`:
+
+```js
+const onIndiciesFulfilled = (result) => {
+  console.log(result)
+  Todo.findByName('take out trash', (err, todo) => {
+    if (err) return console.error(err)
+    console.log(todo)
+  })
+  Todo.findByName('walk the cat', (err, todo) => {
+    if (err) return console.error(err)
+    console.log(todo)
+  })
+}
+
+const onIndiciesRejected = (error) => {
+  console.info(error)
+}
+```
+
+Let's now wrap our `ensureIndicies()` function with a promise:
+
+```js
+const p_ensureIndices = () => {
+  return new Promise((resolve, reject) => {
+    ottoman.ensureIndices(error => {
+      error
+        ? reject(`Rejected: ${error}`)
+        : resolve(`Resolved: Indicies persisted and usable!`)
+    });
+  })
+}
+```
+
+I have used a prefix and typical naming strategy for promised function (`p_`).
+
+Below everything else, let's call this new function and using it's `then()` and `catch()` methods just chained onto the end,. This will wait until `ensureIndicies()` has finished and then call our earlier created methods respectively given it resolves or rejects.
+
+```js
+p_ensureIndices()
+  .then(onIndiciesFulfilled)
+  .catch(onIndiciesRejected)
 ```

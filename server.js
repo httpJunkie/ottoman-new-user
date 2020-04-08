@@ -62,14 +62,32 @@ todo_03.save((err) => err
   : console.info("success: Todo added!")
 );
 
-ottoman.ensureIndices(function(err) {
-  if (err) {
-    console.log('failed to created necessary indices', err);
-    return;
-  }
+const p_ensureIndices = () => {
+  return new Promise((resolve, reject) => {
+    ottoman.ensureIndices(error => {
+      error
+        ? reject(`Rejected: ${error}`)
+        : resolve(`Resolved: Indicies persisted and usable!`)
+    });
+  })
+}
 
+const onIndiciesFulfilled = (result) => {
+  console.log(result)
   Todo.findByName('take out trash', (err, todo) => {
     if (err) return console.error(err)
     console.log(todo)
   })
-});
+  Todo.findByName('walk the cat', (err, todo) => {
+    if (err) return console.error(err)
+    console.log(todo)
+  })
+}
+
+const onIndiciesRejected = (error) => {
+  console.info(error)
+}
+
+p_ensureIndices()
+  .then(onIndiciesFulfilled)
+  .catch(onIndiciesRejected)
