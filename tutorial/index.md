@@ -87,7 +87,7 @@ var Todo = ottoman.model('todo', {
       type: 'refdoc'
     }
   }
-});
+})
 ```
 
 We have used four different types in this model (`string`, `boolean`, `integer`, and `Date`) telling Ottoman what kind of data to use for each field in our model. Ottoman supports many other types and we will learn about more as we continue the tutorial.
@@ -104,19 +104,19 @@ var todo_01 = new Todo({
   complete: false,
   priority: 1,
   created: Date.now()
-});
+})
 var todo_02 = new Todo({
   name: 'walk the dog',
   complete: false,
   priority: 2,
   created: Date.now()
-});
+})
 var todo_03 = new Todo({
   name: 'walk the cat',
   complete: false,
   priority: 2,
   created: Date.now()
-});
+})
 ```
 
 The created date is added utilizing the [Date.now()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now) JavaScript method and evaluated when we call `.save()` and added to the document for insertion to the bucket in a format like:
@@ -131,17 +131,15 @@ Call Ottoman's `save()` method on each of these objects which will add them to o
 todo_01.save((err) => err
   ? console.error(err)
   : console.info("success: Todo added!")
-);
-
+)
 todo_02.save((err) => err
   ? console.error(err)
   : console.info("success: Todo added!")
-);
-
+)
 todo_03.save((err) => err
   ? console.error(err)
   : console.info("success: Todo added!")
-);
+)
 ```
 
 With the `save()` methods added, let's run our app. You should get three success messages in the console and zero errors.

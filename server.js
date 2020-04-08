@@ -26,41 +26,39 @@ var Todo = ottoman.model('todo', {
     //   type: 'n1ql'
     // }
   }
-});
+})
 
 var todo_01 = new Todo({
   name: 'take out trash',
   complete: false,
   priority: 1,
   created: Date.now()
-});
+})
 var todo_02 = new Todo({
   name: 'walk the dog',
   complete: false,
   priority: 2,
   created: Date.now()
-});
+})
 var todo_03 = new Todo({
   name: 'walk the cat',
   complete: false,
   priority: 2,
   created: Date.now()
-});
+})
 
 todo_01.save((err) => err
   ? console.error(err)
   : console.info("success: Todo added!")
-);
-
+)
 todo_02.save((err) => err
   ? console.error(err)
   : console.info("success: Todo added!")
-);
-
+)
 todo_03.save((err) => err
   ? console.error(err)
   : console.info("success: Todo added!")
-);
+)
 
 const p_ensureIndices = () => {
   return new Promise((resolve, reject) => {
@@ -68,7 +66,7 @@ const p_ensureIndices = () => {
       error
         ? reject(`Rejected: ${error}`)
         : resolve(`Resolved: Indicies persisted and usable!`)
-    });
+    })
   })
 }
 
