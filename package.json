@@ -12,7 +12,7 @@
   "dependencies": {
     "couchbase": "^2.6.11",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "ottoman": "^1.0.6"
   }
 }
